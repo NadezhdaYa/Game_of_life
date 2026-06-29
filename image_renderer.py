@@ -26,20 +26,13 @@ def render_grid_to_png(
     path: str,
     cell_size: int = 10,
     base_color: Color = (255, 0, 0),
-    dead_color: Color = (240, 240, 240)
+    dead_color: Color = (240, 240, 240),
+    max_age_scale: int = 20,
 ) -> None:
     rows = len(grid)
     cols = len(grid[0]) if rows > 0 else 0
     width = cols * cell_size
     height = rows * cell_size
-
-    # Найдём максимальный возраст для корректной интерполяции
-    max_age = 0
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] > max_age:
-                max_age = grid[r][c]
-
     img = Image.new("RGB", (width, height), dead_color)
     draw = ImageDraw.Draw(img)
 
@@ -47,7 +40,7 @@ def render_grid_to_png(
         for c in range(cols):
             age = grid[r][c]
             if age > 0:
-                color = interpolate_color(base_color, age, max_age)
+                color = interpolate_color(base_color, age, max_age_scale)
                 left = c * cell_size
                 top = r * cell_size
                 right = left + cell_size

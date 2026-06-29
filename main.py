@@ -47,11 +47,28 @@ def main():
     write_generations(args.output, generations)
     print(f"История поколений сохранена в {args.output}")
 
+    # Вычисляем глобальный максимум возраста по всем кадрам
+    global_max_age = 0
+    for gen in generations:
+        for row in gen:
+            for age in row:
+                if age > global_max_age:
+                    global_max_age = age
+
+    # Защита от деления на ноль, если все клетки мертвы
+    max_age_scale = global_max_age if global_max_age > 0 else 1
+    print(f"Глобальный максимальный возраст: {max_age_scale}")
+
     # Генерация PNG для каждого поколения
     os.makedirs(os.path.dirname(args.png_prefix) or ".", exist_ok=True)
     for idx, gen in enumerate(generations):
         png_path = f"{args.png_prefix}_{idx:03d}.png"
-        render_grid_to_png(gen, png_path, cell_size=args.cell_size, base_color=base_color)
+        render_grid_to_png(
+            gen, png_path,
+            cell_size=args.cell_size,
+            base_color=base_color,
+            max_age_scale=max_age_scale
+        )
         print(f"Сохранён кадр: {png_path}")
 
 
